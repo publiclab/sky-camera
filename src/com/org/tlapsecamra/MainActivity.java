@@ -95,7 +95,7 @@ public class MainActivity extends Activity implements OnClickListener,
         Size size = sizes.get(sizes.size()-1);
         p.setPictureSize(size.width, size.height);
         p.setPreviewSize(w, h);
-        p.setFocusMode("continuous-picture");
+        p.setFocusMode("auto");
         cam.setParameters(p);
         try {
             cam.setPreviewDisplay(holder);
