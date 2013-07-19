@@ -3,11 +3,16 @@ package com.org.tlapsecamra;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.hardware.Camera;
+import android.hardware.Camera.AutoFocusCallback;
+import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -23,7 +28,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	Handler timeUpdateHandler;
 	boolean tlapseRunning = false;
 	int currTime = 0;
-	public static final int Time_Period = 5; 
+	public static final int Time_Period = 10; 
 	// in seconds
 	
 	SurfaceView camView;
@@ -46,14 +51,22 @@ public class MainActivity extends Activity implements OnClickListener,
 		startStopButton.setOnClickListener(this);
 		timeUpdateHandler = new Handler();
 	}
+	
+	AutoFocusCallback myAutoFocusCallback = new AutoFocusCallback(){
+
+		@Override
+		public void onAutoFocus(boolean arg0, Camera arg1) {
+			// TODO Auto-generated method stub
+			Toast.makeText(getApplicationContext(), "'It is ready to take the photograph !!!", Toast.LENGTH_SHORT).show();
+		}};
 
 	public void onClick(View v) {
 		if (!tlapseRunning) {
-			startStopButton.setText("Stop");
+			startStopButton.setText("Stop Timer");
 			tlapseRunning = true;
 			timeUpdateHandler.post(timeUpdateTask);
 		} else {
-			startStopButton.setText("Start");
+			startStopButton.setText("Start Timer");
 			tlapseRunning = false;
 			timeUpdateHandler.removeCallbacks(timeUpdateTask);
 		}
@@ -74,6 +87,22 @@ public class MainActivity extends Activity implements OnClickListener,
 	};
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+		Camera.Parameters p = cam.getParameters();
+        List<Size> sizes = p.getSupportedPictureSizes();
+        for (int i=0;i<sizes.size();i++){
+            Log.i("PictureSize", "Supported Size: " +sizes.get(i).width);         
+        }
+        Size size = sizes.get(sizes.size()-1);
+        p.setPictureSize(size.width, size.height);
+        p.setPreviewSize(w, h);
+        p.setFocusMode("continuous-picture");
+        cam.setParameters(p);
+        try {
+            cam.setPreviewDisplay(holder);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 		cam.startPreview();
 	}
 
@@ -83,10 +112,12 @@ public class MainActivity extends Activity implements OnClickListener,
 			cam.setPreviewDisplay(holder);
 			Camera.Parameters parameters = cam.getParameters();
 			if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+				/*parameters.set("orientation", "portrait");*/
 				parameters.set("orientation", "portrait");
 				cam.setDisplayOrientation(90);
 				parameters.setRotation(90);
 			}
+			
 			cam.setParameters(parameters);
 		} catch (IOException exception) {
 			cam.release();
