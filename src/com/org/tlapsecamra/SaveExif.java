@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.media.ExifInterface;
 import java.util.Date;
-import android.util.Log;
 
 
 
@@ -37,7 +36,6 @@ public class SaveExif extends AsyncTask<PicData, Void, String> {
 		        }
 		    	exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE,
 		        		picData.getlats());
-		    	Log.d("Network", " nitu "+picData.getlat()+" patil "+picData.getlats());
 
 		        double lon = picData.getlon()/1000000.0;
 		        if (lon < 0) {
