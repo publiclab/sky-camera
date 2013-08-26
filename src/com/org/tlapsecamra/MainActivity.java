@@ -2,6 +2,8 @@ package com.org.tlapsecamra;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -31,14 +33,17 @@ public class MainActivity extends Activity implements OnClickListener,
 	int currTime = 0;
 	double latitude;
 	double longitude;
-	public static final int Time_Period = 25; 
-	// in seconds
-	private static final String TAG = "Cam View";
+	public static final int Time_Period = 25; 	// in seconds
+	int w; 
+	int h ;
+	//private static final String TAG = "Cam View";
 	private static final SurfaceHolder SurfaceHolder = null;
 	SurfaceView camView;
 	SurfaceHolder surfaceHolder;
 	Camera cam;
 	GPSTracker gps;
+	ArrayList<Integer> arrayList1 = new ArrayList<Integer>();
+	ArrayList<Integer> arrayList2 = new ArrayList<Integer>();
     
 	
 	
@@ -102,16 +107,17 @@ public class MainActivity extends Activity implements OnClickListener,
 	};
 
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-		Camera.Parameters p = cam.getParameters();
+		/*Camera.Parameters p = cam.getParameters();
         List<Size> sizes = p.getSupportedPictureSizes();
         for (int i=0;i<sizes.size();i++){
             Log.i("PictureSize", "Supported Size: " +sizes.get(i).width);         
         }
-        Size size = sizes.get(sizes.size()-1);
+       // Size size = sizes.get(sizes.size()-1);
+        Size size = sizes.get(0);
         p.setPictureSize(size.width, size.height);
         p.setPreviewSize(w, h);
-        p.setFocusMode("infinity");
-        cam.setParameters(p);
+   //     p.setFocusMode("infinity");
+    //    cam.setParameters(p);
         try {
         	 cam.setPreviewDisplay(holder);
         	 cam.startPreview();
@@ -119,23 +125,38 @@ public class MainActivity extends Activity implements OnClickListener,
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-     		
+     	*/
+		cam.startPreview();
+		
 	}
 
 	public void surfaceCreated(SurfaceHolder holder) {
 		try {
+			
 			cam.setPreviewDisplay(holder);
-			Camera.Parameters parameters = cam.getParameters();
+			Camera.Parameters p = cam.getParameters();
 			if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
 				
-				parameters.set("orientation", "portrait");
+				p.set("orientation", "portrait");
 			    cam.stopPreview();
 				cam.setDisplayOrientation(90);
-				parameters.setRotation(90);
-			    cam.startPreview();
+				p.setRotation(90);
+		//        cam.startPreview();
 			}
+			List<Size> sizes = p.getSupportedPictureSizes();
+			for (int i=0;i<sizes.size();i++){
+				arrayList1.add(sizes.get(i).width);
+				arrayList2.add(sizes.get(i).height);
+	     //       Log.i("PictureSize", "Supported Size: " +sizes.get(i).width);         
+	        }
 			
-			cam.setParameters(parameters);
+			w = Collections.max(arrayList1);
+			h = Collections.max(arrayList2);
+			p.setPictureSize(w, h);
+	      //  p.setPreviewSize(w, h);
+			p.setFocusMode("infinity");
+			cam.setParameters(p);
+			cam.startPreview();
 		} catch (IOException exception) {
 			cam.release();
 		}
