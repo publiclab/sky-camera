@@ -8,7 +8,6 @@ import java.util.List;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.hardware.Camera;
-import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +20,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+
 public class MainActivity extends Activity implements OnClickListener,
 	SurfaceHolder.Callback, Camera.PictureCallback {
 	Button startStopButton;
@@ -28,12 +29,16 @@ public class MainActivity extends Activity implements OnClickListener,
 	Handler timeUpdateHandler;
 	boolean tlapseRunning = false;
 	int currTime = 0;
-	public static final int Time_Period = 10; 
+	double latitude;
+	double longitude;
+	public static final int Time_Period = 25; 
 	// in seconds
-	
+	private static final String TAG = "Cam View";
+	private static final SurfaceHolder SurfaceHolder = null;
 	SurfaceView camView;
 	SurfaceHolder surfaceHolder;
 	Camera cam;
+	GPSTracker gps;
     
 	
 	
@@ -50,20 +55,25 @@ public class MainActivity extends Activity implements OnClickListener,
 		startStopButton = (Button) findViewById(R.id.CountDownButton);
 		startStopButton.setOnClickListener(this);
 		timeUpdateHandler = new Handler();
+		gps = new GPSTracker(MainActivity.this);
 	}
 	
-	AutoFocusCallback myAutoFocusCallback = new AutoFocusCallback(){
-
-		@Override
-		public void onAutoFocus(boolean arg0, Camera arg1) {
-			// TODO Auto-generated method stub
-			Toast.makeText(getApplicationContext(), "'It is ready to take the photograph !!!", Toast.LENGTH_SHORT).show();
-		}};
 
 	public void onClick(View v) {
 		if (!tlapseRunning) {
 			startStopButton.setText("Stop Timer");
 			tlapseRunning = true;
+			
+			if(gps.canGetLocation()){
+	        	gps.getLocation();
+	        	latitude  = gps.getLatitude();
+	        	longitude = gps.getLongitude();
+	        	Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();	
+	        }else{
+	        	gps.showSettingsAlert();
+	        	
+	        }
+			
 			timeUpdateHandler.post(timeUpdateTask);
 		} else {
 			startStopButton.setText("Start Timer");
@@ -77,7 +87,12 @@ public class MainActivity extends Activity implements OnClickListener,
 			if (currTime < Time_Period) {
 				currTime++;
 			} else {
-				cam.takePicture(null, null, null, MainActivity.this);
+				
+			  	gps.getLocation();
+		       	latitude  = gps.getLatitude();
+		       	longitude = gps.getLongitude();
+		       	Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();	
+		        cam.takePicture(null, null, null, MainActivity.this);
 				currTime = 0;
 			}
 
@@ -95,27 +110,29 @@ public class MainActivity extends Activity implements OnClickListener,
         Size size = sizes.get(sizes.size()-1);
         p.setPictureSize(size.width, size.height);
         p.setPreviewSize(w, h);
-        p.setFocusMode("auto");
+        p.setFocusMode("infinity");
         cam.setParameters(p);
         try {
-            cam.setPreviewDisplay(holder);
+        	 cam.setPreviewDisplay(holder);
+        	 cam.startPreview();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-		cam.startPreview();
+     		
 	}
 
 	public void surfaceCreated(SurfaceHolder holder) {
-		cam = Camera.open();
 		try {
 			cam.setPreviewDisplay(holder);
 			Camera.Parameters parameters = cam.getParameters();
 			if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
-				/*parameters.set("orientation", "portrait");*/
+				
 				parameters.set("orientation", "portrait");
+			    cam.stopPreview();
 				cam.setDisplayOrientation(90);
 				parameters.setRotation(90);
+			    cam.startPreview();
 			}
 			
 			cam.setParameters(parameters);
@@ -134,10 +151,47 @@ public class MainActivity extends Activity implements OnClickListener,
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yymmddhhmmss");
 	    String date = dateFormat.format(new Date());
 	    String photoFile = "Picture_" + date + ".jpg";
-		(new SavePic()).execute(new PicData[]{new PicData(data, photoFile)});
+		(new SavePic()).execute(new PicData[]{new PicData(data, photoFile, latitude, longitude)});
 		camera.startPreview();
 		Toast t = Toast.makeText(this, "Saved JPEG!", Toast.LENGTH_SHORT);
 		t.show();
 	}
+	
 
+	
+	public void onPause() {
+		super.onPause(); // onPause method in the parent class
+		
+		surfaceHolder.removeCallback(this);
+		timeUpdateHandler.removeCallbacks(timeUpdateTask);
+        cam.stopPreview();
+		cam.release();
+		cam=null;
+		tlapseRunning = false;
+		startStopButton.setText("Start Timer");
+		gps.stopUsingGPS();
+	}
+	
+	public void onResume() {
+		super.onResume(); // onResume method in the parent class
+
+	    camView = (SurfaceView) findViewById(R.id.CameraView);
+	    surfaceHolder = camView.getHolder();
+	    surfaceHolder.addCallback(this);
+	    surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+		gps.startUsingGPS();
+		if (cam == null) {
+	        cam = Camera.open();
+	        cam.setDisplayOrientation(90);
+			cam.startPreview();
+			try {
+				cam.setPreviewDisplay(surfaceHolder);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	
 }
