@@ -152,6 +152,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	    String date = dateFormat.format(new Date());
 	    String photoFile = "Picture_" + date + ".jpg";
 		(new SavePic()).execute(new PicData[]{new PicData(data, photoFile, latitude, longitude)});
+		(new SaveExif()).execute(new PicData[]{new PicData(data, photoFile, latitude, longitude)});
 		camera.startPreview();
 		Toast t = Toast.makeText(this, "Saved JPEG!", Toast.LENGTH_SHORT);
 		t.show();
