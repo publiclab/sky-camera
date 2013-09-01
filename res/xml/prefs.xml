@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+ <PreferenceCategory
+   android:summary="Time and Email Information"
+   android:title="Time Period" >
+  <EditTextPreference
+     android:key="time"
+     android:defaultValue="300s"
+     android:summary="Enter time period"
+     android:title="Time Period" />
+  <EditTextPreference
+     android:key="mail"
+     android:defaultValue="mohit216@gmail.com"
+     android:summary="Enter your email-id"
+     android:title="E-Mail ID" />
+ </PreferenceCategory>
+
+ <PreferenceCategory
+   android:summary="Time and Email Information"
+   android:title="Visit us" >
+ <Preference android:title="@string/prefs_web_page" >
+    <intent android:action="android.intent.action.VIEW"
+            android:data="http://mapknitter.org" />
+  </Preference>
+
+  </PreferenceCategory>
+</PreferenceScreen>
