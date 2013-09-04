@@ -9,6 +9,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,7 +17,9 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.FloatMath;
@@ -29,6 +32,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -65,21 +69,21 @@ public class MainActivity extends Activity implements OnClickListener,
 	ArrayList<Integer> arrayList2 = new ArrayList<Integer>();
 	SharedPreferences prefs;
 	
-	
 	@SuppressWarnings({ "deprecation", "static-access" })
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.activity_main);
 		camView = (SurfaceView) this.findViewById(R.id.CameraView);
 		surfaceHolder = camView.getHolder();
 		surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		surfaceHolder.addCallback(this);
-
+       
 		countdownTextView = (TextView) findViewById(R.id.CountDownTextView);
 		prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 		prefs.registerOnSharedPreferenceChangeListener(this);	
-		Log.i("Neetu", "ISO: " +prefs.getString("time", "300s"));
+		//Log.i("Neetu", "ISO: " +prefs.getString("time", "300s"));
 		time = prefs.getString("time", "25");
 		time1 = time;
 		mailid = prefs.getString("mail", "");
@@ -90,6 +94,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		startStopButton.setOnClickListener(this);
 		timeUpdateHandler = new Handler();
 		gps = new GPSTracker(MainActivity.this);
+        
 		
 	}
 	
@@ -195,7 +200,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	private void aboutExposureItem(){
 		
 	    Camera.Parameters p = cam.getParameters();
-		
+	   // Log.i("Neetu", "ISO: " +p.flatten());
 	    int max = p.getMaxExposureCompensation();
 	    int min = p.getMinExposureCompensation();
 	    
@@ -204,7 +209,8 @@ public class MainActivity extends Activity implements OnClickListener,
 	       	Toast.makeText(getApplicationContext(), "Exposure Compensation is not supported by your Smartphone", Toast.LENGTH_LONG).show();	
             return;
         }
-		
+        
+	    
         float step = p.getExposureCompensationStep();
         int maxValue = (int) FloatMath.floor(max*step);
         int minValue = (int) FloatMath.ceil(min*step);
@@ -223,7 +229,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		SeekBar seek1 = (SeekBar) Viewlayout.findViewById(R.id.seekBar1);
 		seek1.setProgress(p.getExposureCompensation()+procal);
 		item1.setText("Exposure Index: " + p.getExposureCompensation());
-		Log.i("Mohit", "camindx: " +p.getExposureCompensation());
+	//	Log.i("Mohit", "camindx: " +p.getExposureCompensation());
 		seek1.setAlpha(1);
 		seek1.setMax(2*maxValue);
 		seek1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -255,7 +261,13 @@ public class MainActivity extends Activity implements OnClickListener,
 
 				});
 		
-	     //  seekBar2
+		if(p.get("iso") == null){
+	    	Toast.makeText(getApplicationContext(), "ISO Modes are not supported by your Smartphone", Toast.LENGTH_LONG).show();	
+            return;
+	    }
+		
+		
+		//  seekBar2
 			SeekBar seek2 = (SeekBar) Viewlayout.findViewById(R.id.seekBar2);
 			seek2.setMax(4);
 			seek2.setProgress(isomode1);
@@ -357,9 +369,76 @@ public class MainActivity extends Activity implements OnClickListener,
    }
 		
 	
-	
-	
-	
+   public class SendEmailAsyncTask extends AsyncTask<PicData, Void, String> {
+		
+		Mail m = new Mail("gsocpublabs@gmail.com", "publabs1234");
+				
+		    
+		    @Override
+		    protected String doInBackground(PicData... params) {
+		
+		    	if(params != null && params.length > 0)
+				{
+					PicData picData = params[0];
+					String sdPath = Environment.getExternalStorageDirectory().getPath() + "/TLapseFolder/";
+					String fileName = picData.getName();
+					String savefile = sdPath + fileName;
+		    	    String sendemail =picData.getemail();
+		    	
+		    	String[] toArr = {""+sendemail}; 
+		        m.setTo(toArr); 
+		        m.setFrom("gsocpublabs@gmail.com"); 
+		        m.setSubject("GSoC 2013 Email"); 
+		        m.setBody("Latitude: " + picData.getlats() + " Longitude " + picData.getlons() );	
+		    	
+
+		        try { 
+		           
+		        //	m.addAttachment(""+savefile); 
+		          
+		          if(m.send()) { 
+		        	  runOnUiThread(new Runnable() 
+		        	  {
+		        	     public void run() 
+		        	     {
+		        	    	 Toast.makeText(MainActivity.this, "Email was sent successfully.", Toast.LENGTH_LONG).show();    
+		        	     }
+		        	  }); 
+		        	  
+		        	  
+		        	 // Log.i("hindilit", " Mail Sent " + "True");
+		          } else { 
+		        	  runOnUiThread(new Runnable() 
+		        	  {
+		        	     public void run() 
+		        	     {
+		        	    	 Toast.makeText(MainActivity.this, "Email was not sent.", Toast.LENGTH_LONG).show();    
+		        	     }
+		        	  }); 
+		        	  
+		        	  //  Log.i("hindilit", " Mail Sent " + "False");
+		          } 
+		        } catch(Exception e) { 
+		        	runOnUiThread(new Runnable() 
+		        	  {
+		        	     public void run() 
+		        	     {
+		        	    	 Toast.makeText(MainActivity.this, "There was a problem sending the email.", Toast.LENGTH_LONG).show();    
+		        	     }
+		        	  }); 
+		        	  
+		        	
+		        	 
+		         // Log.e("Mail", "Could not send email", e); 
+		        } 
+				
+				}
+		    	return null;
+		    }
+			
+	}
+   
+   
 	public void onClick(View v) {
 		if (!tlapseRunning) {
 			
@@ -456,8 +535,8 @@ public class MainActivity extends Activity implements OnClickListener,
 		(new SaveExif()).execute(new PicData[]{new PicData(data, photoFile, latitude, longitude, mailid)});
 		(new SendEmailAsyncTask()).execute(new PicData[]{new PicData(data, photoFile, latitude, longitude, mailid)});
 	    camera.startPreview();
-		Toast t = Toast.makeText(this, "Saved JPEG!", Toast.LENGTH_SHORT);
-		t.show();
+//		Toast t = Toast.makeText(this, "Saved JPEG!", Toast.LENGTH_SHORT);
+//		t.show();
 	}
 	
 
@@ -492,15 +571,20 @@ public class MainActivity extends Activity implements OnClickListener,
 	        cam.setDisplayOrientation(90);
 			Camera.Parameters p = cam.getParameters();
             p.setExposureCompensation(expindx);
-            p.set("iso", isomode);
-	        cam.setParameters(p);
+            Log.i("Neetu", "ISO: " +p.get("iso"));
+            
+            if(!(p.get("iso") == null)){
+                p.set("iso", isomode);
+    	    }
+            
+            cam.setParameters(p);
 	        cam.startPreview();
-			try {
+			/*try {
 				cam.setPreviewDisplay(surfaceHolder);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 			
 		}
 	}

@@ -5,12 +5,12 @@
    android:title="Time Period" >
   <EditTextPreference
      android:key="time"
-     android:defaultValue="300s"
+     android:defaultValue="25s"
      android:summary="Enter time period"
      android:title="Time Period" />
   <EditTextPreference
      android:key="mail"
-     android:defaultValue="mohit216@gmail.com"
+     android:defaultValue="mohitmeena.216@gmail.com"
      android:summary="Enter your email-id"
      android:title="E-Mail ID" />
  </PreferenceCategory>
