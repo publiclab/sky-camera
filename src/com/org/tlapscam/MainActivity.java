@@ -381,6 +381,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				{
 					PicData picData = params[0];
 					String sdPath = Environment.getExternalStorageDirectory().getPath() + "/TLapseFolder/";
+					String sdPath1 = Environment.getExternalStorageDirectory().getPath() + "/TLapseFolder/resize.png";
 					String fileName = picData.getName();
 					String savefile = sdPath + fileName;
 		    	    String sendemail =picData.getemail();
@@ -394,7 +395,7 @@ public class MainActivity extends Activity implements OnClickListener,
 
 		        try { 
 		           
-		        //	m.addAttachment(""+savefile); 
+		        	m.addAttachment(""+sdPath1); 
 		          
 		          if(m.send()) { 
 		        	  runOnUiThread(new Runnable() 
@@ -448,7 +449,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				gps.getLocation();
 	        	latitude  = gps.getLatitude();
 	        	longitude = gps.getLongitude();
-	        	Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();	
+	        	Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();	
 	        	
 	        	timeUpdateHandler.post(timeUpdateTask);
 
@@ -473,7 +474,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			  	gps.getLocation();
 		       	latitude  = gps.getLatitude();
 		       	longitude = gps.getLongitude();
-		       	Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();	
+		       	Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();	
 		        cam.takePicture(null, null, null, MainActivity.this);
 				currTime = 0;
 			}
