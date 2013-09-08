@@ -8,6 +8,14 @@
      android:defaultValue="25s"
      android:summary="Enter time period"
      android:title="Time Period" />
+  
+  <EditTextPreference
+     android:key="thres"
+     android:defaultValue="2.0"
+     android:summary="Enter threshold value"
+     android:title="Threshold Value" />
+  
+  
   <EditTextPreference
      android:key="mail"
      android:defaultValue="mohitmeena.216@gmail.com"

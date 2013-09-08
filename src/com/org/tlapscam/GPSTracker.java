@@ -13,16 +13,18 @@ import android.os.IBinder;
 import android.provider.Settings;
 
 
+
 public class GPSTracker extends Service implements LocationListener {
 
 	private final Context mContext;
-
+	
 	boolean canGetLocation = false;
 
 	Location location; // location
 	double latitude; // latitude
 	double longitude; // longitude
 
+	
 	protected LocationManager locationManager;
 
 	public GPSTracker(Context context) {

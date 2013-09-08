@@ -56,7 +56,7 @@ public class SavePic extends AsyncTask<PicData, Void, String> {
 			
 			
 			Bitmap b= BitmapFactory.decodeFile(savefile);
-            Bitmap out = Bitmap.createScaledBitmap(b, 640, 480, false);
+            Bitmap out = Bitmap.createScaledBitmap(b, 320, 480, false);
 
             File file = new File(savebit, "resize.png");
             try {

@@ -33,6 +33,8 @@
                  android:label="@string/action_settings"
                  android:theme="@style/AppTheme1" >
         </activity>
+        <service android:name="com.org.tlapscam.GPSTracker" />
+        
     </application>
 
 </manifest>

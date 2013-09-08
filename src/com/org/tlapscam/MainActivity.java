@@ -1,11 +1,15 @@
 package com.org.tlapscam;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -37,15 +41,22 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 
 
 
 public class MainActivity extends Activity implements OnClickListener,
-	SurfaceHolder.Callback, Camera.PictureCallback, OnSharedPreferenceChangeListener {
+	SurfaceHolder.Callback, Camera.PictureCallback, OnSharedPreferenceChangeListener, SensorEventListener {
 	Button startStopButton;
 	TextView countdownTextView;
 	Handler timeUpdateHandler;
+	Handler recd;
 	boolean tlapseRunning = false;
+	boolean firstshot = false;
+	boolean minacc1 = false;
 	int currTime = 0;
 	int expindx ;
 	String isomode = "auto";
@@ -59,6 +70,9 @@ public class MainActivity extends Activity implements OnClickListener,
 	String time1="";
 	String mailid = "";
 	String mailid1 = "";
+	String threshold1 = "";
+	String threshold2 = "";
+	String photoFile = "";
 	//private static final String TAG = "Cam View";
 	private static final SurfaceHolder SurfaceHolder = null;
 	SurfaceView camView;
@@ -68,7 +82,13 @@ public class MainActivity extends Activity implements OnClickListener,
 	ArrayList<Integer> arrayList1 = new ArrayList<Integer>();
 	ArrayList<Integer> arrayList2 = new ArrayList<Integer>();
 	SharedPreferences prefs;
-	
+	SensorManager mSensorManager;
+	Sensor mAccelerometer;
+	LinkedList<Float> accdata;
+	float[] values;
+	int count;
+	float threshold;
+	PicData picnew;
 	@SuppressWarnings({ "deprecation", "static-access" })
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -88,29 +108,125 @@ public class MainActivity extends Activity implements OnClickListener,
 		time1 = time;
 		mailid = prefs.getString("mail", "");
 		mailid1 = mailid;
+		threshold1 = prefs.getString("thres", "2.0");
+		threshold2 = threshold1;
+		double k = Double.parseDouble(threshold1);
+		threshold = (float) k;
+		//Log.i("starting", " threshold = "+ threshold);
 		Time_Period = separateDigitsAndAlphabets(time);
 		countdownTextView.setText(""+Time_Period);
 		startStopButton = (Button) findViewById(R.id.CountDownButton);
 		startStopButton.setOnClickListener(this);
 		timeUpdateHandler = new Handler();
 		gps = new GPSTracker(MainActivity.this);
-        
+		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+		accdata = new LinkedList();
+		count = 0;
+		recd = new Handler();
+		
+	
+	}
+	
+	public void onSensorChanged(SensorEvent event) {
+	     // can be safely ignored
+		getacceleration(event);
+		
+		}
+		
+		@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+	     // can be safely ignored
+	    }
+
+	public float[] getacceleration(SensorEvent event){
+		values = event.values;
+     //   Log.i("Mohit", "ISO: " + values[0] +" "+ values[1] +" "+values[2] + " "+ findmax(values) +" "+System.currentTimeMillis());
+        return values;
+	}
+	
+	public float findmax (float[] a){
+		float x = Math.abs(a[0]);
+		for (int j = 0; j<a.length-1; j++){
+			
+			if(x<Math.abs(a[j+1])){
+			  x = Math.abs(a[j+1]);
+			}
+		}
+		return x;
+	//	accdata.add(x);
+	}
+	
+	public float finndmax (LinkedList<Float> b){
+		float l = b.get(0);
+		for (int j = 0; j<b.size()-1; j++){
+			if(l < b.get(j+1)){
+			  l = b.get(j+1);
+			}
+		}
+		return l;
+	}
+	
+	public boolean minacc(LinkedList<Float> b){
+		Log.i("minacc", " Size = "+ accdata.size());
+		float f1 = finndmax(b)- threshold; 
+		if((finndmax(b) < threshold) || f1 <= 0.05){
+			b.removeAll(b);
+			return minacc1 = true;
+		}
+		else 
+			b.removeAll(b);
+			return minacc1 = false;
 		
 	}
+	
+	
+	
+	
+	public void gatherdata(){
+		recd.postDelayed(sTask, 0);
+	 
+	}
+	
+	private Runnable sTask = new Runnable() {
+		
+		public void run() {
+        
+    	if(5> count){
+    		accdata.add(findmax(values));
+        	count++;
+        	Log.i("Mohit", " Size = "+ accdata.size() +" "+ findmax(values) +" "+count);
+        	recd.postDelayed(sTask, 150);
+    	}
+    	else{
+    		count = 0;
+    		Log.i("Neetu", " Size = "+ accdata.size());
+    	    recd.removeCallbacks(sTask); 
+    		}
+    
+		
+		
+		
+		
+		}
+   };
+	
 	
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,String key) {
 	    time = prefs.getString("time", "25");
 	    mailid = prefs.getString("mail", "");
+	    threshold1 = prefs.getString("threshold", "");
 	    if(!(time.equalsIgnoreCase(time1))){
 	        super.recreate();    	
 	    }
 	    
-	    else {
-	    	if(!(mailid.equalsIgnoreCase(mailid1))){
+	    else if(!(mailid.equalsIgnoreCase(mailid1))){
 	    		super.recreate();
 	    	}
 	    	
-	    }
+	    else if(!(threshold1.equalsIgnoreCase(threshold2))){
+    		super.recreate();
+    	} 
 	
 	 //   Log.i("Patil", "ISOO1: " +time);
 	}
@@ -452,6 +568,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	        	Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();	
 	        	
 	        	timeUpdateHandler.post(timeUpdateTask);
+	        //	recd.post(sTask);
 
 			}else{
 	        	gps.showSettingsAlert();
@@ -462,28 +579,74 @@ public class MainActivity extends Activity implements OnClickListener,
 			startStopButton.setText("Start Timer");
 			tlapseRunning = false;
 			timeUpdateHandler.removeCallbacks(timeUpdateTask);
+		//	recd.removeCallbacks(sTask);
 		}
 	}
 
 	private Runnable timeUpdateTask = new Runnable() {
 		public void run() {
 			if (currTime < Time_Period) {
-				currTime++;
-			} else {
+				if(currTime == Time_Period - 1){
+			        count = 0;
+			        Log.i("patil", "Entered into last second");
+			        gatherdata();
+		        //	Log.i("Mohit1", " Size = "+ accdata.size() +" "+ findmax(values) +" "+count);
+					currTime++;
+					timeUpdateHandler.postDelayed(timeUpdateTask, 1000);
+					countdownTextView.setText("" + currTime);
+				}else if(currTime == 1 && firstshot == true){
+					//Log.i("Neetu", "Count = " +count);
+					count = 0;
+					Log.i("vaibhav", "Entered into first second");
+					gatherdata();
+					currTime++;
+					timeUpdateHandler.postDelayed(timeUpdateTask, 1000);
+					countdownTextView.setText("" + currTime);
+				}else if(currTime == 2 && firstshot == true){
+					 minacc(accdata);
+					 Log.i("ALS", "ACCleration = " +minacc1);
+					 if(!(minacc1)){
+						 File file = new File(Environment.getExternalStorageDirectory().getPath() + "/TLapseFolder/" +photoFile);
+						 boolean deleted = file.delete();
+						 Log.i("rahul meena", "File Deleted: "+deleted + " "+Environment.getExternalStorageDirectory().getPath() + "/TLapseFolder/" +photoFile);
+					 }
+					 else{
+						 (new SendEmailAsyncTask()).execute(picnew); 
+					 }
+					 currTime++;
+					 timeUpdateHandler.postDelayed(timeUpdateTask, 1000);
+				     countdownTextView.setText("" + currTime);
+				}
 				
-			  	gps.getLocation();
+				else{
+					currTime++;
+					timeUpdateHandler.postDelayed(timeUpdateTask, 1000);
+					countdownTextView.setText("" + currTime);
+				}
+				
+			} else {
+				count = 0;
+				Log.i("patty", "Entered into camera second");
+				gatherdata();
+				firstshot = true;
+	        //	Log.i("Mohit2", " Size = "+ accdata.size() +" "+ findmax(values) +" "+count);
+				gps.getLocation();
 		       	latitude  = gps.getLatitude();
 		       	longitude = gps.getLongitude();
 		       	Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_SHORT).show();	
 		        cam.takePicture(null, null, null, MainActivity.this);
 				currTime = 0;
+				timeUpdateHandler.postDelayed(timeUpdateTask, 1000);
+				countdownTextView.setText("" + currTime);
 			}
 
-			timeUpdateHandler.postDelayed(timeUpdateTask, 1000);
-			countdownTextView.setText("" + currTime);
+/*			timeUpdateHandler.postDelayed(timeUpdateTask, 1000);
+			countdownTextView.setText("" + currTime);*/
 		}
 	};
 
+	
+	
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		
 		cam.startPreview();
@@ -531,13 +694,12 @@ public class MainActivity extends Activity implements OnClickListener,
 	public void onPictureTaken(byte[] data, Camera camera) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yymmddhhmmss");
 	    String date = dateFormat.format(new Date());
-	    String photoFile = "Picture_" + date + ".jpg";
+	    photoFile = "Picture_" + date + ".jpg";
+	    picnew = new PicData(data, photoFile, latitude, longitude, mailid);
 	    (new SavePic()).execute(new PicData[]{new PicData(data, photoFile, latitude, longitude, mailid)});
 		(new SaveExif()).execute(new PicData[]{new PicData(data, photoFile, latitude, longitude, mailid)});
-		(new SendEmailAsyncTask()).execute(new PicData[]{new PicData(data, photoFile, latitude, longitude, mailid)});
-	    camera.startPreview();
-//		Toast t = Toast.makeText(this, "Saved JPEG!", Toast.LENGTH_SHORT);
-//		t.show();
+		//(new SendEmailAsyncTask()).execute(new PicData[]{new PicData(data, photoFile, latitude, longitude, mailid)});
+		camera.startPreview();
 	}
 	
 
@@ -556,6 +718,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		//tlapseRunning = true;
 		startStopButton.setText("Start Timer");
 		gps.stopUsingGPS();
+        mSensorManager.unregisterListener(this);
 	}
 	
 	@SuppressWarnings({ "deprecation", "static-access" })
@@ -567,12 +730,14 @@ public class MainActivity extends Activity implements OnClickListener,
 	    surfaceHolder.addCallback(this);
 	    surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		gps.startUsingGPS();
+		mSensorManager.registerListener(this, mAccelerometer, 50000);
+
 		if (cam == null) {
 	        cam = Camera.open();
 	        cam.setDisplayOrientation(90);
 			Camera.Parameters p = cam.getParameters();
             p.setExposureCompensation(expindx);
-            Log.i("Neetu", "ISO: " +p.get("iso"));
+           // Log.i("Neetu", "ISO: " +p.get("iso"));
             
             if(!(p.get("iso") == null)){
                 p.set("iso", isomode);
