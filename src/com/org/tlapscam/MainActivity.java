@@ -8,9 +8,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
+//import android.hardware.Camera.AutoFocusCallback; 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -104,7 +102,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 		prefs.registerOnSharedPreferenceChangeListener(this);	
 		//Log.i("Neetu", "ISO: " +prefs.getString("time", "300s"));
-		time = prefs.getString("time", "25");
+		time = prefs.getString("time", "7s");
 		time1 = time;
 		mailid = prefs.getString("mail", "");
 		mailid1 = mailid;
@@ -121,13 +119,21 @@ public class MainActivity extends Activity implements OnClickListener,
 		gps = new GPSTracker(MainActivity.this);
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-		accdata = new LinkedList();
+		accdata = new LinkedList<Float>();
 		count = 0;
 		recd = new Handler();
 		
 	
 	}
 	
+	
+	/*AutoFocusCallback myAutoFocusCallback = new AutoFocusCallback(){
+		 @Override
+		    public void onAutoFocus(boolean arg0, Camera arg1) {
+		      // TODO Auto-generated method stub
+		      Toast.makeText(getApplicationContext(), "'It is ready to take the photograph !!!", Toast.LENGTH_SHORT).show();
+		    }}; 
+	*/
 	public void onSensorChanged(SensorEvent event) {
 	     // can be safely ignored
 		getacceleration(event);
@@ -678,6 +684,8 @@ public class MainActivity extends Activity implements OnClickListener,
 			h = Collections.max(arrayList2);
 			p.setPictureSize(w, h);
 	    	p.setFocusMode("infinity");
+	    //	p.set("jpeg-quality", 100);
+	    //	p.setFocusMode("continuous-picture");
 			cam.setParameters(p);
 			cam.startPreview();
 		} catch (IOException exception) {
