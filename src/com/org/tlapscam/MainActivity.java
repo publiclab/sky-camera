@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-//import android.hardware.Camera.AutoFocusCallback; 
+import android.hardware.Camera.AutoFocusCallback; 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -127,13 +127,13 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 	
 	
-	/*AutoFocusCallback myAutoFocusCallback = new AutoFocusCallback(){
+	AutoFocusCallback myAutoFocusCallback = new AutoFocusCallback(){
 		 @Override
 		    public void onAutoFocus(boolean arg0, Camera arg1) {
 		      // TODO Auto-generated method stub
 		      Toast.makeText(getApplicationContext(), "'It is ready to take the photograph !!!", Toast.LENGTH_SHORT).show();
 		    }}; 
-	*/
+	
 	public void onSensorChanged(SensorEvent event) {
 	     // can be safely ignored
 		getacceleration(event);
@@ -683,9 +683,9 @@ public class MainActivity extends Activity implements OnClickListener,
 			w = Collections.max(arrayList1);
 			h = Collections.max(arrayList2);
 			p.setPictureSize(w, h);
-	    	p.setFocusMode("infinity");
-	    //	p.set("jpeg-quality", 100);
-	    //	p.setFocusMode("continuous-picture");
+	    //	p.setFocusMode("infinity");
+	    	p.set("jpeg-quality", 100);
+	    	p.setFocusMode("continuous-picture");
 			cam.setParameters(p);
 			cam.startPreview();
 		} catch (IOException exception) {
