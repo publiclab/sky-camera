@@ -19,5 +19,5 @@
         android:title="@string/action_about"
         android:orderInCategory="100"
         android:showAsAction="never"/>
-    
+
 </menu>
