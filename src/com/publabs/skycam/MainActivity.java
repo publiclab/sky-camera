@@ -131,7 +131,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		 @Override
 		    public void onAutoFocus(boolean arg0, Camera arg1) {
 		      // TODO Auto-generated method stub
-		      Toast.makeText(getApplicationContext(), "'It is ready to take the photograph !!!", Toast.LENGTH_SHORT).show();
+		   //   Toast.makeText(getApplicationContext(), "'It is ready to take the photograph !!!", Toast.LENGTH_SHORT).show();
 		    }}; 
 	
 	public void onSensorChanged(SensorEvent event) {
@@ -152,6 +152,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 	
 	public float findmax (float[] a){
+		Log.i("payal", "ISO: " + values[0] +" "+values[1]+" "+values[2]);
 		float x = Math.abs(a[0]);
 		for (int j = 0; j<a.length-1; j++){
 			
@@ -654,7 +655,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	
 	
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-		
+		cam.autoFocus(myAutoFocusCallback);
 		cam.startPreview();
 		
 	}
@@ -683,9 +684,10 @@ public class MainActivity extends Activity implements OnClickListener,
 			w = Collections.max(arrayList1);
 			h = Collections.max(arrayList2);
 			p.setPictureSize(w, h);
-	    //	p.setFocusMode("infinity");
-	    	p.set("jpeg-quality", 100);
-	    	p.setFocusMode("continuous-picture");
+		//	p.setFocusMode("infinity");
+	     	p.setFocusMode("auto");
+	    //	p.set("jpeg-quality", 100);
+	    //	p.setFocusMode("continuous-picture");
 			cam.setParameters(p);
 			cam.startPreview();
 		} catch (IOException exception) {
@@ -739,7 +741,9 @@ public class MainActivity extends Activity implements OnClickListener,
 	    surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		gps.startUsingGPS();
 		mSensorManager.registerListener(this, mAccelerometer, 50000);
-
+	//	boolean ac;
+	//	ac = mSensorManager.registerListener(this,mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 50000);
+	//	Log.i("Neetu", "accelereo working: " +ac);
 		if (cam == null) {
 	        cam = Camera.open();
 	        cam.setDisplayOrientation(90);
