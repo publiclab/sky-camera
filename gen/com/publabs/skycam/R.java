@@ -58,6 +58,8 @@ public final class R {
         public static final int exposure_compensation=0x7f070006;
         public static final int hello_world=0x7f070002;
         public static final int iso_mode=0x7f070005;
+        public static final int prefs_learnweb_page=0x7f070008;
+        public static final int prefs_opensourceweb_page=0x7f070009;
         public static final int prefs_web_page=0x7f070007;
     }
     public static final class style {

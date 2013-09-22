@@ -8,5 +8,7 @@
     <string name="action_exposure">Exposure</string>
     <string name="iso_mode">ISO Mode</string>
     <string name="exposure_compensation">Exposure Compensation</string>
-    <string name="prefs_web_page">Want to make a map..Visit us</string>
+    <string name="prefs_web_page">Make a map..</string>
+    <string name="prefs_learnweb_page">Attach a phone to balloon..</string>
+    <string name="prefs_opensourceweb_page">Download source code</string>
 </resources>

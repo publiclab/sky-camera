@@ -30,6 +30,16 @@
     <intent android:action="android.intent.action.VIEW"
             android:data="http://mapknitter.org" />
   </Preference>
+  
+ <Preference android:title="@string/prefs_learnweb_page" >
+    <intent android:action="android.intent.action.VIEW"
+            android:data="http://publiclab.org/wiki/balloon-mapping" />
+ </Preference>
 
+ <Preference android:title="@string/prefs_opensourceweb_page" >
+    <intent android:action="android.intent.action.VIEW"
+            android:data="https://github.com/mohit216/Sky-Cam" />
+ </Preference>
+ 
   </PreferenceCategory>
 </PreferenceScreen>
