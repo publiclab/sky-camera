@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+ <PreferenceCategory
+   android:summary="Time and Email Information"
+   android:title="Time Period" >
+  <EditTextPreference
+     android:key="time"
+     android:defaultValue="7s"
+     android:summary="it should be greater than 7s(s for second)"
+     android:title="Time Period" />
+  
+  <EditTextPreference
+     android:key="thres"
+     android:defaultValue="2.0"
+     android:summary="Enter threshold value"
+     android:title="Threshold Value" />
+  
+  
+  <EditTextPreference
+     android:key="mail"
+     android:defaultValue="mohitmeena.216@gmail.com"
+     android:summary="Enter your email-id"
+     android:title="E-Mail ID" />
+ </PreferenceCategory>
+
+ <PreferenceCategory
+   android:summary="Time and Email Information"
+   android:title="Visit us" >
+ <Preference android:title="@string/prefs_web_page" >
+    <intent android:action="android.intent.action.VIEW"
+            android:data="http://mapknitter.org" />
+  </Preference>
+  
+ <Preference android:title="@string/prefs_learnweb_page" >
+    <intent android:action="android.intent.action.VIEW"
+            android:data="http://publiclab.org/wiki/balloon-mapping" />
+ </Preference>
+
+ <Preference android:title="@string/prefs_opensourceweb_page" >
+    <intent android:action="android.intent.action.VIEW"
+            android:data="https://github.com/mohit216/Sky-Cam" />
+ </Preference>
+ 
+  </PreferenceCategory>
+</PreferenceScreen>
