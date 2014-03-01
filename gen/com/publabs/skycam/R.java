@@ -30,16 +30,15 @@ public final class R {
         public static final int ic_menu_preferences=0x7f020002;
     }
     public static final class id {
-        public static final int CameraView=0x7f0a0005;
-        public static final int CountDownButton=0x7f0a0008;
-        public static final int CountDownTextView=0x7f0a0007;
-        public static final int LinearLayout01=0x7f0a0006;
-        public static final int about=0x7f0a000b;
-        public static final int exposure=0x7f0a000a;
+        public static final int about=0x7f0a000a;
+        public static final int bCountDown=0x7f0a0007;
+        public static final int exposure=0x7f0a0009;
+        public static final int layoutCameraView=0x7f0a0005;
         public static final int layout_dialog=0x7f0a0000;
         public static final int seekBar1=0x7f0a0002;
         public static final int seekBar2=0x7f0a0004;
-        public static final int settings=0x7f0a0009;
+        public static final int settings=0x7f0a0008;
+        public static final int tvCountDown=0x7f0a0006;
         public static final int txtItem1=0x7f0a0001;
         public static final int txtItem2=0x7f0a0003;
     }
@@ -61,6 +60,7 @@ public final class R {
         public static final int prefs_learnweb_page=0x7f070008;
         public static final int prefs_opensourceweb_page=0x7f070009;
         public static final int prefs_web_page=0x7f070007;
+        public static final int start_timer=0x7f07000a;
     }
     public static final class style {
         /** 
