@@ -162,11 +162,16 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 	}
 	
 	public void takePicture() {
-		// get GPS location
-		mGPSTracker.getLocation();
-       	Toast.makeText(mContext, "Your Location is - \nLat: " + mGPSTracker.getLatitude() + "\nLong: " + mGPSTracker.getLongitude(), Toast.LENGTH_SHORT).show();
-		// shoot
-       	mCamera.takePicture(null, null, this);
+		if(mSensorTracker.isDeviceStable()) {
+			// get GPS location
+			mGPSTracker.getLocation();
+	       	Toast.makeText(mContext, "Your Location is - \nLat: " + mGPSTracker.getLatitude() + "\nLong: " + mGPSTracker.getLongitude(), Toast.LENGTH_SHORT).show();
+			// shoot
+	       	mCamera.takePicture(null, null, this);
+		} else {
+			Toast.makeText(mContext, "Device is shaky. Photo is not taken", Toast.LENGTH_SHORT).show();
+		}
+		
 	}
 
 	@Override

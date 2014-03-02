@@ -2,9 +2,11 @@ package com.publabs.skycam;
 
 import com.publabs.skycam.objects.CameraPreview;
 import com.publabs.skycam.utils.Timer;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -98,6 +100,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	protected void onResume() {
 		super.onResume();
 		mPreview.startPreview();
+		Log.v("Main", "OnResume");
 	}
 	
 	@Override
@@ -105,8 +108,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onPause();
 		mPreview.stopPreview();
 		if(mTimer.isStarted())	mTimer.stopTimer();
+		Log.v("Main", "OnPause");
 	}
-	
-	
 	
 }
