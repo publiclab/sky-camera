@@ -83,9 +83,6 @@ public abstract class CountDownTimer {
 
 				if (millisLeft <= 0) {
 					onFinish();
-				} else if (millisLeft < mCountdownInterval) {
-					onTick(millisLeft);
-					sendMessageDelayed(obtainMessage(MSG), millisLeft);
 				} else {
 					long lastTickStart = SystemClock.elapsedRealtime();
 					onTick(millisLeft);
