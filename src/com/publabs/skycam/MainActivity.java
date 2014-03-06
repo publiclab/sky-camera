@@ -184,6 +184,50 @@ public class MainActivity extends Activity implements OnClickListener {
 			tvExposureTip.setText("Tip: exposure compensation is not supported");
 		}
 		
+		// check for ISO modes
+		if(mPreview.isISOModeSupported()) {
+			// calculate values for iso
+			Camera.Parameters paras = mPreview.getCameraParameters();
+			String currentISO = paras.get("iso");
+			String values = paras.get("iso-values");
+			final String[] isoValues = values.split(",");
+			
+			tvISOTip.setText("Supported ISO values : " + values);
+			sbISOMode.setAlpha(1);
+			sbISOMode.setMax(isoValues.length-1);
+			
+			// set current iso progress
+			tvISO.setText("ISO value: " + currentISO);
+			int currentISOPosition = 0;
+			for(int i = 0; i < isoValues.length; i++) {
+				if(isoValues[i].equals(currentISO)) {
+					currentISOPosition = i;
+					break;
+				}
+			}
+			sbISOMode.setProgress(currentISOPosition);
+			
+			sbISOMode.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+				@Override
+				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+					String selectedMode = isoValues[progress];
+					tvISO.setText("ISO value: " + selectedMode);
+					mPreview.setISOMode(selectedMode);
+				}
+
+				@Override
+				public void onStartTrackingTouch(SeekBar arg0) {}
+
+				@Override
+				public void onStopTrackingTouch(SeekBar seekBar) {}
+		    });
+			
+		} else {
+			Toast.makeText(getApplicationContext(), "ISO Modes are not supported by your Smartphone", Toast.LENGTH_LONG).show();	
+			tvISOTip.setText("Tip: ISO modes are not supported");
+		}
+		
 		popDialog.create();
 		popDialog.show();
 	}

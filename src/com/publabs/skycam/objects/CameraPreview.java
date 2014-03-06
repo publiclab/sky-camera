@@ -204,10 +204,23 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 		return (paras.getMinExposureCompensation() != 0 && paras.getMaxExposureCompensation() != 0);
 	}
 	
+	public boolean isISOModeSupported() {
+		Camera.Parameters paras = getCameraParameters();
+		return (paras.get("iso") != null);
+	}
+	
 	public void setExposureCompensation(int exposure){
 		Camera.Parameters p = getCameraParameters();
 	    mCamera.stopPreview();
 		p.setExposureCompensation(exposure);
+	    mCamera.setParameters(p);
+		mCamera.startPreview();
+	}
+	
+	public void setISOMode(String isoValue) {
+		Camera.Parameters p = getCameraParameters();
+	    mCamera.stopPreview();
+		p.set("iso", isoValue);
 	    mCamera.setParameters(p);
 		mCamera.startPreview();
 	}
