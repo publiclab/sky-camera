@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Timer {
 
@@ -28,43 +29,47 @@ public class Timer {
 	}
 	
 	public void startTimer() {
-		try {
-			int timePeriod = getTimePeriod();
-			timer = new CountDownTimer(timePeriod * 1000, 1000) {
-				
-				@Override
-				public void onTick(long millisUntilFinished) {
-					long secondsRemaining = Math.round(millisUntilFinished / 1000.0);
-					Log.v("On Tick", "Remaing : " + secondsRemaining + " s");
-					tvTimerStatus.setText(Long.toString(secondsRemaining));
-				}
-				
-				@Override
-				public void onFinish() {
-					Log.v("Finish", "Timer Finished");
-					activity.onTimerFinished();
-					startTimer();
-				}
-			};
+		int timePeriod = getTimePeriod();
+		timer = new CountDownTimer(timePeriod * 1000, 1000) {
 			
-			timer.start();
-			isStarted = true;
-		} catch(NumberFormatException ex) {
-			ex.printStackTrace();
-			stopTimer();
-		}
+			@Override
+			public void onTick(long millisUntilFinished) {
+				long secondsRemaining = Math.round(millisUntilFinished / 1000.0);
+				Log.v("On Tick", "Remaing : " + secondsRemaining + " s");
+				tvTimerStatus.setText(Long.toString(secondsRemaining));
+			}
+			
+			@Override
+			public void onFinish() {
+				Log.v("Finish", "Timer Finished");
+				activity.onTimerFinished();
+				startTimer();
+			}
+		};
+		
+		timer.start();
+		isStarted = true;
 	}
 	
 	public void stopTimer() {
-		isStarted = false;
-		timer.cancel();
-		tvTimerStatus.setText("");
+		if(timer != null) {
+			isStarted = false;
+			timer.cancel();
+			tvTimerStatus.setText("");
+		}
 	}
 	
 	private int getTimePeriod() throws NumberFormatException {
 		String timePeriod = prefs.getString("time", Constants.DEFAULT_TIME_PERIOD);
-		int ret = Integer.parseInt(timePeriod);
-		return ret;
+		try {
+			int ret = Integer.parseInt(timePeriod);
+			return ret;
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			Toast.makeText(activity, "Invalid Time Period. Please change it", Toast.LENGTH_SHORT).show();
+		}
+		
+		return Integer.parseInt(Constants.DEFAULT_TIME_PERIOD);
 	}
 	
 }

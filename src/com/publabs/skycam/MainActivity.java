@@ -1,6 +1,7 @@
 package com.publabs.skycam;
 
 import com.publabs.skycam.objects.CameraPreview;
+import com.publabs.skycam.utils.GPSTracker;
 import com.publabs.skycam.utils.Timer;
 
 import android.app.Activity;
@@ -28,6 +29,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private Button bCountDownTimer;
 	
     private CameraPreview mPreview;
+    private GPSTracker mGPSTracker;
     private Timer mTimer;
 	
 	@Override
@@ -38,6 +40,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		// initialization
 		tvCountDownTimer = (TextView) findViewById(R.id.tvCountDown);
 		bCountDownTimer = (Button) findViewById(R.id.bCountDown);
+		
+		mGPSTracker = new GPSTracker(this);
 		
 		// create preview view and set it as the content of the activity.
         mPreview = new CameraPreview(this);
@@ -112,8 +116,13 @@ public class MainActivity extends Activity implements OnClickListener {
 			// stop the timer
 			handleStopTimer();
 		} else {
-			// start the timer
-			handleStartTimer();
+			// check whether GPS is enabled
+			if(mGPSTracker.canGetLocation()) {
+				// start the timer
+				handleStartTimer();
+			} else {
+				mGPSTracker.showSettingsAlert();
+			}
 		}
 	}
 
