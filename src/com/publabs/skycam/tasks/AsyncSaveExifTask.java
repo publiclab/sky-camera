@@ -38,8 +38,7 @@ public class AsyncSaveExifTask extends AsyncTask<PicData, Void, String> {
 		        } else {
 		            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, "E");
 		        }
-		        exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE,
-		        		picData.getlons());
+		        exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, picData.getlons());
 			    
 		        exif.saveAttributes();
 		        exif.setAttribute(ExifInterface.TAG_DATETIME, (new Date(System.currentTimeMillis())).toString());    

@@ -194,5 +194,22 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 	    PicData picData = new PicData(data, photoFile, mGPSTracker.getLatitude(), mGPSTracker.getLongitude(), mailID);
 	    return picData;
 	}
+	
+	public Camera.Parameters getCameraParameters() {
+		return mCamera.getParameters();
+	}
+	
+	public boolean isExposureCompensationSupported() {
+		Camera.Parameters paras = getCameraParameters();
+		return (paras.getMinExposureCompensation() != 0 && paras.getMaxExposureCompensation() != 0);
+	}
+	
+	public void setExposureCompensation(int exposure){
+		Camera.Parameters p = getCameraParameters();
+	    mCamera.stopPreview();
+		p.setExposureCompensation(exposure);
+	    mCamera.setParameters(p);
+		mCamera.startPreview();
+	}
 
 }

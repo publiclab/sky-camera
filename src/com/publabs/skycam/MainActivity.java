@@ -4,16 +4,23 @@ import com.publabs.skycam.objects.CameraPreview;
 import com.publabs.skycam.utils.Timer;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -56,7 +63,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch (item.getItemId()) {
 
 		    case R.id.exposure:
-		    	//aboutExposureItem();
+		    	showExposureSettingsDialog();
 	        	break; 
 
 	        case R.id.settings:
@@ -64,13 +71,27 @@ public class MainActivity extends Activity implements OnClickListener {
 	        	break;
 
 	        case R.id.about:
-	        	//aboutMenuItem();
+	        	showAboutDialog();
 	        	break;
 
 		}
 	    return true;
 	}
-	
+
+	private void showAboutDialog() {
+		AlertDialog.Builder alertAbout = new AlertDialog.Builder(this);
+		alertAbout.setTitle("About");
+		alertAbout.setMessage("This app by Public Lab, will take periodic photographs, and is intended to operate a cheap Android phone while attached to a balloon or kite, for aerial photography. It emails small previews of photos and the latitude and longitude to the given email address, while in flight. " +
+	  		"Be sure to share your work with the rest of the Public Lab community at PublicLab.org!");
+		alertAbout.setNeutralButton("OK", new DialogInterface.OnClickListener(){
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.cancel();
+			}
+		});
+		alertAbout.show();
+	}
+
 	public void onTimerFinished() {
 		mPreview.takePicture();
 	}
@@ -109,6 +130,62 @@ public class MainActivity extends Activity implements OnClickListener {
 		mPreview.stopPreview();
 		if(mTimer.isStarted())	mTimer.stopTimer();
 		Log.v("Main", "OnPause");
+	}
+	
+	private void showExposureSettingsDialog() {
+		final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
+        final LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+        final View viewLayout = inflater.inflate(R.layout.dialog_exposure_settings, (ViewGroup) findViewById(R.id.layout_dialog_exposure_settings));      
+        
+        final TextView tvExposureTip = (TextView) viewLayout.findViewById(R.id.tvExposureSettingsCompensationTip);
+        final TextView tvExposure = (TextView) viewLayout.findViewById(R.id.tvExposureSettingsCompensation);
+        final TextView tvISO = (TextView) viewLayout.findViewById(R.id.tvExposureSettingsISOMode);
+        final TextView tvISOTip = (TextView) viewLayout.findViewById(R.id.tvExposureSettingsISOModeTip);
+        final SeekBar sbExposureCompensation = (SeekBar) viewLayout.findViewById(R.id.sbExposureSettingsCompensation);
+        final SeekBar sbISOMode = (SeekBar) viewLayout.findViewById(R.id.sbExposureSettingsISOMode);
+        
+		popDialog.setIcon(android.R.drawable.btn_star_big_on);
+		popDialog.setTitle("EXPOSURE SETTINGS");
+		popDialog.setView(viewLayout);
+		
+		// check for exposure compensation
+		if(mPreview.isExposureCompensationSupported()) {
+			// calculate values
+			Camera.Parameters paras = mPreview.getCameraParameters();
+			int maxExposure = paras.getMaxExposureCompensation();
+			int minExposure = paras.getMinExposureCompensation();
+	        final int halfRange = maxExposure;
+	        
+	        tvExposureTip.setText("Tip: select exposure value between " + minExposure +" and " + maxExposure);
+	        sbExposureCompensation.setProgress(paras.getExposureCompensation() + halfRange);
+			tvExposure.setText("Exposure Index: " + paras.getExposureCompensation());
+			sbExposureCompensation.setAlpha(1);
+			sbExposureCompensation.setMax(2*halfRange);
+			
+			sbExposureCompensation.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+				@Override
+				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+					progress = progress - halfRange;
+					tvExposure.setText("Exposure Index: " + progress);
+					mPreview.setExposureCompensation(progress);
+				}
+
+				@Override
+				public void onStartTrackingTouch(SeekBar arg0) {}
+
+				@Override
+				public void onStopTrackingTouch(SeekBar seekBar) {}
+		    });
+
+	        
+		} else {
+			Toast.makeText(getApplicationContext(), "Exposure Compensation is not supported by your Smartphone", Toast.LENGTH_LONG).show();	
+			tvExposureTip.setText("Tip: exposure compensation is not supported");
+		}
+		
+		popDialog.create();
+		popDialog.show();
 	}
 	
 }
