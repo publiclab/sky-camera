@@ -5,7 +5,7 @@
    android:title="Time Period" >
   <EditTextPreference
      android:key="time"
-     android:defaultValue="7s"
+     android:defaultValue="7"
      android:summary="it should be greater than 7s(s for second)"
      android:title="Time Period" />
   

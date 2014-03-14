@@ -11,4 +11,5 @@
     <string name="prefs_web_page">Make a map..</string>
     <string name="prefs_learnweb_page">Attach a phone to balloon..</string>
     <string name="prefs_opensourceweb_page">Download source code</string>
+    <string name="start_timer">Start Timer</string>
 </resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_dialog_exposure_settings"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <TextView
+        android:id="@+id/tvExposureSettingsCompensation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/exposure_compensation"
+        android:textStyle="bold" />
+
+    <SeekBar
+        android:id="@+id/sbExposureSettingsCompensation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp" />
+
+    <TextView
+        android:id="@+id/tvExposureSettingsCompensationTip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/action_exposure"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tvExposureSettingsISOMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/iso_mode"
+        android:textStyle="bold" />
+
+    <SeekBar
+        android:id="@+id/sbExposureSettingsISOMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp" />
+    
+    <TextView
+        android:id="@+id/tvExposureSettingsISOModeTip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:text="@string/action_exposure"
+        android:textSize="12sp" />    
+
+</LinearLayout>
